@@ -8,7 +8,7 @@ import mlflow.sklearn
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import ElasticNet
 
-from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score,accuracy_score
+from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score,accuracy_score,roc_auc_score
 from sklearn.model_selection import train_test_split
 
 import argparse
@@ -24,9 +24,10 @@ def get_data():
         raise
 
 
-def evaluate(actual, pred):
+def evaluate(actual, pred,pred_proba):
     accuracy = accuracy_score(actual, pred)
-    return accuracy
+    roc_auc_score=roc_auc_score(actual,pred_proba,multi_class='ovr')
+    return accuracy,roc_auc_score
 
 
 def main(n_estimators,max_depth):
@@ -42,13 +43,23 @@ def main(n_estimators,max_depth):
     lr.fit(train_x,train_y)
     pred=lr.predict(test_x)
     rmse, mae, r2= evaluate(test_y, pred)'''
+    with mlflow.startrun():
+        rf=RandomForestClassifier(n_estimators=n_estimators,max_depth=max_depth)
+        rf.fit(train_x,train_y)
+        pred=rf.predict(test_x)
 
-    rf=RandomForestClassifier(n_estimators=n_estimators,max_depth=max_depth)
-    rf.fit(train_x,train_y)
-    pred=rf.predict(test_x)
-    accuracy=evaluate(test_y,pred)
+        pred_proba=rf.predict_proba(test_x)
 
-    print("  Accuracy score: %s" % accuracy)
+        accuracy,roc_auc_score=evaluate(test_y,pred,pred_proba)
+
+
+        print("  Accuracy score: %s" % accuracy)
+
+        mlflow.log_param("n_estimators",n_estimators)
+        mlflow.log_param("max_depth",max_depth)
+
+        mlflow.log_metric("accuracy",accuracy)
+        mlflow.log_metric("rou-auc-score",roc_auc_score)
 
 if __name__=='__main__':
     args=argparse.ArgumentParser()
