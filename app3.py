@@ -21,13 +21,12 @@ def get_data():
         df=pd.read_csv(url,sep=";")
         return df
     except Exception as e:
-        raise
-
+        raise e
 
 def evaluate(actual, pred,pred_proba):
     accuracy = accuracy_score(actual, pred)
-    roc_auc_score=roc_auc_score(actual,pred_proba,multi_class='ovr')
-    return accuracy,roc_auc_score
+    rc_score=roc_auc_score(actual,pred_proba,multi_class='ovr')
+    return accuracy,rc_score
 
 
 def main(n_estimators,max_depth):
@@ -43,14 +42,14 @@ def main(n_estimators,max_depth):
     lr.fit(train_x,train_y)
     pred=lr.predict(test_x)
     rmse, mae, r2= evaluate(test_y, pred)'''
-    with mlflow.startrun():
+    with mlflow.start_run():
         rf=RandomForestClassifier(n_estimators=n_estimators,max_depth=max_depth)
         rf.fit(train_x,train_y)
         pred=rf.predict(test_x)
 
         pred_proba=rf.predict_proba(test_x)
 
-        accuracy,roc_auc_score=evaluate(test_y,pred,pred_proba)
+        accuracy,rcscore=evaluate(test_y,pred,pred_proba)
 
 
         print("  Accuracy score: %s" % accuracy)
@@ -59,7 +58,9 @@ def main(n_estimators,max_depth):
         mlflow.log_param("max_depth",max_depth)
 
         mlflow.log_metric("accuracy",accuracy)
-        mlflow.log_metric("rou-auc-score",roc_auc_score)
+        mlflow.log_metric("rou-auc-score",rcscore)
+
+        mlflow.sklearn.log_model(rf,"random forest model")
 
 if __name__=='__main__':
     args=argparse.ArgumentParser()

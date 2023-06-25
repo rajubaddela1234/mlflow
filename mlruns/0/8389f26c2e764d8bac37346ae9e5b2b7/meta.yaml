@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/HP/Desktop/mlflow/mlflow/mlruns/0/8389f26c2e764d8bac37346ae9e5b2b7/artifacts
+end_time: 1687698869287
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 8389f26c2e764d8bac37346ae9e5b2b7
+run_name: stately-cod-896
+run_uuid: 8389f26c2e764d8bac37346ae9e5b2b7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1687698869006
+status: 3
+tags: []
+user_id: HP
