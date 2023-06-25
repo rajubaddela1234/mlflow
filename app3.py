@@ -7,8 +7,11 @@ import mlflow.sklearn
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import ElasticNet
-from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score
+
+from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score,accuracy_score
 from sklearn.model_selection import train_test_split
+
+import argparse
 
 def get_data():
 
@@ -21,6 +24,11 @@ def get_data():
         raise
 
 
+def evaluate(actual, pred):
+    accuracy = accuracy_score(actual, pred)
+    return accuracy
+
+
 def main():
 
     df=get_data()
@@ -30,9 +38,23 @@ def main():
     train_y = train[["quality"]]
     test_y = test[["quality"]]
 
+    '''lr=ElasticNet()
+    lr.fit(train_x,train_y)
+    pred=lr.predict(test_x)
+    rmse, mae, r2= evaluate(test_y, pred)'''
 
+    rf=RandomForestClassifier()
+    rf.fit(train_x,train_y)
+    pred=rf.predict(test_x)
+    accuracy=evaluate(test_y,pred)
+
+    print("  Accuracy score: %s" % accuracy)
 
 if __name__=='__main__':
+    args=argparse.ArgumentParser()
+    args.add_argument("--n_estimators","-n",default=100,type=int)
+    args.add_argument("--max_depth","-m",default=5,type=int)
+    parse_args=args.parse_args()
     try:
         main()
     except Exception as e:
