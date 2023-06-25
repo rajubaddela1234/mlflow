@@ -29,7 +29,7 @@ def evaluate(actual, pred):
     return accuracy
 
 
-def main():
+def main(n_estimators,max_depth):
 
     df=get_data()
     train,test=train_test_split(df)
@@ -43,7 +43,7 @@ def main():
     pred=lr.predict(test_x)
     rmse, mae, r2= evaluate(test_y, pred)'''
 
-    rf=RandomForestClassifier()
+    rf=RandomForestClassifier(n_estimators=n_estimators,max_depth=max_depth)
     rf.fit(train_x,train_y)
     pred=rf.predict(test_x)
     accuracy=evaluate(test_y,pred)
@@ -56,6 +56,6 @@ if __name__=='__main__':
     args.add_argument("--max_depth","-m",default=5,type=int)
     parse_args=args.parse_args()
     try:
-        main()
+        main(n_estimators=parse_args.n_estimators,max_depth=parse_args.max_depth)
     except Exception as e:
         raise e
